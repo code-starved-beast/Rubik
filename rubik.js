@@ -92,9 +92,9 @@ var R = new FaceIsometry([0,  1, 37,
 	          8,  9, 10, 11, 12,  2, 16, 25, 36, 47, 18, 19,
 	         20,/*L*/21, 22,/*F*/ 4, 15,/*R*/35, 44,/*B*/27,
 	         28, 29, 30, 31, 32,  7, 14, 24, 34, 42, 38, 39,
-	                     40, 41,  2,
-	                     43,/*D*/ 4,
-	                     45, 46,  7]);
+	                     40, 41,  13,
+	                     43,/*D*/ 23,
+	                     45, 46,  33]);
 
 var L = new FaceIsometry([11,  1,  2,
 	                      22,/*U*/ 4,
@@ -117,17 +117,38 @@ var Cube = {
 };
 
 var moves = ["F", "B", "U", "D", "R", "L"];
-var blah = [];
+var permutation = [];
 
 /* Now we run tests with random permutations */
 for (var i = 0; i < 357; i += 1) {
-	blah.push(moves[Math.floor(Math.random()*6)]);
+	permutation.push(moves[Math.floor(Math.random()*6)]);
 }
 
+var Cube = new Array(357);
+
+for (var i = 0; i < 357; i += 1) {
+	Cube[i] = new Array(357)
+	for (var j = 0; j < 357; j += 1) {
+		Cube[i][j] = "";
+		if (i == j) {
+			Cube[i][j] = permutation[356 - i]
+		}
+	}
+}
 /*
-var L4 = L.composedWith(L.composedWith(L.composedWith(L)));
+for (var k = 1; k < 357; k += 1) {
+	for (var i = 0; i + k < 357; i += 1) {
+		Cube[i][i + k] = function () {
+			var val = 
+			for (var j = 0; j < k - i)
+		}
+	}
+}*/
+
+/*
+var L2R2 = (R.composedWith(R.composedWith(R.composedWith(R.composedWith(L.composedWith(L.composedWith(R.composedWith(R.composedWith(L.composedWith(L.composedWith(R.composedWith(R))))))))))));
 
 for (var i = 0; i < 48; i +=1) {
-	console.log(L4.cycles[i]);
+	console.log(L2R2.cycles[i]);
 }
 */

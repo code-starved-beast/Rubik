@@ -27,12 +27,13 @@
  */
 
 function FaceIsometry(cycles) {
- 	this.cycles = cycles;
+
+ 	this.cycles = cycles.slice();
  	this.composedWith = function(iso) {
- 		var length = this.cycles.length
- 		if (iso.cycles.length == length) {
- 			var composition = new Array(length);
- 			for (var i = 0; i < length; i++) {
+
+ 		if (this.cycles.length == iso.cycles.length) {
+ 			var composition = new Array(this.cycles.length);
+ 			for (var i = 0; i < this.cycles.length; i++) {
  				composition[i] = iso.cycles[this.cycles[i]];
  			}
  			return new FaceIsometry(composition);
@@ -42,7 +43,21 @@ function FaceIsometry(cycles) {
  			return this;
  		}
   	}
+	this.isEquivalentTo = function(perm) {
+
+		if (this.cycles.length != perm.cycles.length) {
+			return false;
+		} else {
+			for (var i = 0; i < perm.cycles.length; i += 1) {
+				if (this.cycles[i] != perm.cycles[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
 } 
+
 /* note: face isometry looks like inverse move as
  *       indexed function in shape of cube diagram.
  */
@@ -105,50 +120,53 @@ var L = new FaceIsometry([11,  1,  2,
 	                      39, 41, 42,
 	                      27,/*D*/44,
 	                      19, 46, 47]);
-	
 
-var Cube = {
+/* identity "do nothing" element */
+var e = F.composedWith(F.composedWith(F.composedWith(F)));
+
+var moveTable = {
 	"F": F,
 	"B": B,
 	"U": U,
 	"D": D,
 	"R": R,
-	"L": L
+	"L": L,
+	"e" : e
 };
 
-var moves = ["F", "B", "U", "D", "R", "L"];
+
+var moves = ["F", "B", "U", "D", "R", "L", "e"];
 var permutation = [];
+var numMoves = 21;
 
 /* Now we run tests with random permutations */
-for (var i = 0; i < 357; i += 1) {
+for (var i = 0; i < numMoves; i += 1) {
 	permutation.push(moves[Math.floor(Math.random()*6)]);
 }
+/* probably better to creat a parser module... */
+var Cube = new Array(numMoves);
 
-var Cube = new Array(357);
-
-for (var i = 0; i < 357; i += 1) {
-	Cube[i] = new Array(357)
-	for (var j = 0; j < 357; j += 1) {
+for (var i = 0; i < numMoves; i += 1) {
+	Cube[i] = new Array(numMoves)
+	for (var j = 0; j < numMoves; j += 1) {
 		Cube[i][j] = "";
 		if (i == j) {
-			Cube[i][j] = permutation[356 - i]
+			Cube[i][j] = permutation[numMoves - i];
 		}
 	}
 }
-/*
-for (var k = 1; k < 357; k += 1) {
-	for (var i = 0; i + k < 357; i += 1) {
-		Cube[i][i + k] = function () {
-			var val = 
-			for (var j = 0; j < k - i)
+
+/* parse the sequence of moves to a smaller equivalent assembly using context-free parsing */
+for (var k = 1; k < numMoves; k += 1) { //k == coordinate increment == row number
+	for (var i = 0; i + k < numMoves; i += 1) {
+		var subPerm = new FaceIsometry(e.cycles);
+		for (var j = 0; j < k - i; j += 1) {
+			subPerm = subPerm.composedWith(moveTable[Cube[i + j][i + j]]);
+		}
+		for (var l = 0; l < moves.length; l += 1) {
+			if (subPerm.isEquivalentTo(moveTable[moves[i]])) {
+				Cube[k][i] = moves[i];
+			}
 		}
 	}
-}*/
-
-/*
-var L2R2 = (R.composedWith(R.composedWith(R.composedWith(R.composedWith(L.composedWith(L.composedWith(R.composedWith(R.composedWith(L.composedWith(L.composedWith(R.composedWith(R))))))))))));
-
-for (var i = 0; i < 48; i +=1) {
-	console.log(L2R2.cycles[i]);
 }
-*/
